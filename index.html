@@ -250,6 +250,11 @@
                         <span>Riwayat Dokumen</span>
                     </button>
 
+                    <button data-target="secAkun" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 text-sm font-medium rounded-xl text-slate-600 hover:bg-slate-100 transition-all">
+                        <i class="fa-solid fa-id-badge w-5 text-center text-sky-500"></i>
+                        <span>Akun Saya</span>
+                    </button>
+
                     <div class="pt-4 mt-4 border-t border-slate-100">
                         <p class="px-3 text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2">Administrasi</p>
                         <button id="navAdminSettings" data-target="secAdmin" class="nav-btn hidden w-full flex items-center gap-3 px-3.5 py-2.5 text-sm font-medium rounded-xl text-slate-600 hover:bg-slate-100 transition-all">
@@ -314,6 +319,7 @@
                             <ul class="space-y-0.5 text-[11px] list-disc list-inside">
                                 <li><strong>Admin:</strong> admin / edudigital</li>
                                 <li><strong>Dosen:</strong> dosen / edudigital</li>
+                                <li><strong>Dosen (pending):</strong> dosen2 / edudigital</li>
                             </ul>
                         </div>
                     </div>
@@ -726,17 +732,17 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <!-- AI Settings Card -->
                         <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-                            <h3 class="font-bold text-sm text-slate-700 border-b pb-2"><i class="fa-solid fa-key text-purple-600 mr-2"></i> Konfigurasi Gemini API Key</h3>
+                            <h3 class="font-bold text-sm text-slate-700 border-b pb-2"><i class="fa-solid fa-key text-purple-600 mr-2"></i> API Key Gratis (Default Bersama)</h3>
                             
                             <form id="frmSaveApiKey" onsubmit="handleSaveApiKey(event)" class="space-y-3">
                                 <div>
-                                    <label class="block text-xs font-semibold text-slate-600 mb-1">Google Gemini API Key</label>
+                                    <label class="block text-xs font-semibold text-slate-600 mb-1">Google AI Studio API Key — Versi Gratis</label>
                                     <input type="password" id="txtApiKey" class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-purple-500 outline-none" placeholder="AIzaSy...">
-                                    <p class="text-[11px] text-slate-400 mt-1">Kunci API digunakan untuk terhubung secara langsung ke model generatif Gemini.</p>
+                                    <p class="text-[11px] text-slate-400 mt-1">Kunci ini dipakai bersama oleh SELURUH user paket GRATIS secara default. Admin dapat memperbarui kunci ini secara reguler. User paket BERBAYAR menggunakan API key pribadi masing-masing.</p>
                                 </div>
 
                                 <button type="submit" class="py-2 px-4 bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs rounded-xl shadow-md transition-all">
-                                    Simpan Key API
+                                    Simpan Key Default
                                 </button>
                             </form>
                         </div>
@@ -766,6 +772,70 @@
                                     Tambah Akun
                                 </button>
                             </form>
+                        </div>
+
+                        <!-- User Management Table Card -->
+                        <div class="md:col-span-2 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                            <div class="flex items-center justify-between border-b pb-2 flex-wrap gap-2">
+                                <h3 class="font-bold text-sm text-slate-700"><i class="fa-solid fa-users-gear text-brand-600 mr-2"></i> Manajemen User & Paket Layanan</h3>
+                                <span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 font-semibold">Aktif/Pending • Gratis/Berbayar • API Key Pribadi</span>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-sm">
+                                    <thead class="bg-slate-50 border-b border-slate-200 text-xs text-slate-500 uppercase tracking-wider">
+                                        <tr>
+                                            <th class="py-3 px-3">Pengguna</th>
+                                            <th class="py-3 px-3">Role</th>
+                                            <th class="py-3 px-3 text-center">Status</th>
+                                            <th class="py-3 px-3 text-center">Paket</th>
+                                            <th class="py-3 px-3">API Key Pribadi (Berbayar)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tblUsersBody" class="divide-y divide-slate-100">
+                                        <tr>
+                                            <td colspan="5" class="py-8 text-center text-slate-400 text-xs">Memuat data pengguna...</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="secAkun" class="content-section hidden space-y-6 max-w-3xl">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-800">Akun Saya</h2>
+                        <p class="text-xs text-slate-500">Informasi Akun, Paket Layanan, dan API Key Pribadi Anda</p>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                        <div class="flex items-center gap-3 border-b pb-3">
+                            <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-500 text-white flex items-center justify-center text-lg shadow-md shadow-brand-500/20">
+                                <i class="fa-solid fa-user-tie"></i>
+                            </div>
+                            <div>
+                                <h3 id="akunNama" class="font-bold text-slate-800 text-base">-</h3>
+                                <p id="akunUsername" class="text-xs text-slate-500">@-</p>
+                            </div>
+                        </div>
+
+                        <dl class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+                            <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+                                <dt class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Role</dt>
+                                <dd id="akunRole" class="font-semibold text-slate-700 text-sm mt-0.5">-</dd>
+                            </div>
+                            <div class="p-3 rounded-xl bg-slate-50 border border-slate-200">
+                                <dt class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Status Akun</dt>
+                                <dd id="akunStatus" class="mt-1">-</dd>
+                            </div>
+                            <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 sm:col-span-2">
+                                <dt class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Paket Layanan</dt>
+                                <dd id="akunPaket" class="mt-1">-</dd>
+                            </div>
+                        </dl>
+
+                        <div id="akunApiBox" class="p-4 rounded-xl border border-slate-200 bg-slate-50 text-xs text-slate-600 space-y-2">
+                            <!-- Konten API key diinjeksi via JS -->
                         </div>
                     </div>
                 </section>
@@ -805,12 +875,16 @@
         let documentVault = [];
         let deferredPrompt = null;
         let activeApiKey = "";
+        let usersDb = [];
 
         document.addEventListener('DOMContentLoaded', () => {
             initApp();
         });
 
         function initApp() {
+            seedUsers();
+            activeApiKey = localStorage.getItem('academic_ai_default_key') || '';
+
             // Update UI mode status
             const badge = document.getElementById('badgeSystemMode');
             if (badge) {
@@ -861,11 +935,25 @@
 
             document.getElementById('btnLogout')?.addEventListener('click', handleLogout);
 
-            // Load Dummy or Session User
+            // Load Session User (sinkron dengan database user terkini)
             const savedUser = localStorage.getItem('academic_ai_user');
             if (savedUser) {
                 currentUser = JSON.parse(savedUser);
-                setupUserSession();
+                const rec = usersDb.find(x => x.username === currentUser.username);
+                if (rec && rec.status !== 'aktif') {
+                    localStorage.removeItem('academic_ai_user');
+                    currentUser = null;
+                    showToast('Akun Anda pending / dinonaktifkan. Hubungi admin.', 'error');
+                } else {
+                    if (rec) {
+                        currentUser.nama_lengkap = rec.nama_lengkap;
+                        currentUser.role = rec.role;
+                        currentUser.status = rec.status;
+                        currentUser.plan = rec.plan;
+                        currentUser.personalApiKey = rec.personalApiKey;
+                    }
+                    setupUserSession();
+                }
             }
         }
 
@@ -884,6 +972,9 @@
                 }
             });
 
+            if (sectionId === 'secAdmin') renderUserMgmtTable();
+            if (sectionId === 'secAkun') renderAkunInfo();
+
             // Close sidebar mobile when section clicked
             if (window.innerWidth < 1024) {
                 document.getElementById('mainSidebar').classList.add('hidden');
@@ -898,18 +989,17 @@
             showToast('Memverifikasi akun...', 'info');
 
             if (IS_PREVIEW) {
-                // Dummy Authentication Logic
+                // Autentikasi dari database user lokal (preview mode)
                 setTimeout(() => {
-                    if (u === 'admin' && p === 'edudigital') {
-                        currentUser = { username: 'admin', nama_lengkap: 'Dr. Administrator M.Kom', role: 'Admin' };
-                        setupUserSession();
-                        showToast('Berhasil login sebagai Admin!', 'success');
-                    } else if (u === 'dosen' && p === 'edudigital') {
-                        currentUser = { username: 'dosen', nama_lengkap: 'Dr. Budi Santoso, M.T.', role: 'Dosen' };
-                        setupUserSession();
-                        showToast('Berhasil login sebagai Dosen!', 'success');
-                    } else {
+                    const rec = usersDb.find(x => x.username === u && x.password === p);
+                    if (!rec) {
                         showToast('Username atau password salah!', 'error');
+                    } else if (rec.status !== 'aktif') {
+                        showToast('Akun Anda masih PENDING. Hubungi admin untuk aktivasi.', 'error');
+                    } else {
+                        currentUser = { username: rec.username, nama_lengkap: rec.nama_lengkap, role: rec.role, status: rec.status, plan: rec.plan, personalApiKey: rec.personalApiKey };
+                        setupUserSession();
+                        showToast(`Berhasil login sebagai ${rec.role} — Paket ${rec.plan === 'berbayar' ? 'Berbayar' : 'Gratis'}!`, 'success');
                     }
                 }, 500);
             } else {
@@ -1335,14 +1425,207 @@
 
         function handleSaveApiKey(e) {
             e.preventDefault();
-            activeApiKey = document.getElementById('txtApiKey').value;
-            showToast('Kunci Gemini API berhasil diperbarui!', 'success');
+            activeApiKey = document.getElementById('txtApiKey').value.trim();
+            localStorage.setItem('academic_ai_default_key', activeApiKey);
+            showToast('API key default (gratis) berhasil diperbarui!', 'success');
         }
 
         function handleAddUser(e) {
             e.preventDefault();
-            showToast('Akun Dosen baru berhasil didaftarkan!', 'success');
+            const nama = document.getElementById('newNama').value.trim();
+            const username = document.getElementById('newUsername').value.trim();
+            const password = document.getElementById('newPassword').value.trim();
+
+            if (usersDb.some(x => x.username === username)) {
+                showToast('Username sudah digunakan!', 'error');
+                return;
+            }
+
+            usersDb.push({ username, password, nama_lengkap: nama, role: 'Dosen', status: 'aktif', plan: 'gratis', personalApiKey: '' });
+            saveUsers();
+            renderUserMgmtTable();
+            showToast('Akun Dosen baru berhasil didaftarkan (paket GRATIS)!', 'success');
             document.getElementById('frmAddUser').reset();
+        }
+
+        /* ==================================================
+           MANAJEMEN USER, PAKET & API KEY
+           ================================================== */
+        function seedUsers() {
+            const saved = localStorage.getItem('academic_ai_users');
+            if (saved) {
+                usersDb = JSON.parse(saved);
+                return;
+            }
+            usersDb = [
+                { username: 'admin', password: 'edudigital', nama_lengkap: 'Dr. Administrator M.Kom', role: 'Admin', status: 'aktif', plan: 'berbayar', personalApiKey: '' },
+                { username: 'dosen', password: 'edudigital', nama_lengkap: 'Dr. Budi Santoso, M.T.', role: 'Dosen', status: 'aktif', plan: 'gratis', personalApiKey: '' },
+                { username: 'dosen2', password: 'edudigital', nama_lengkap: 'Dr. Siti Aminah, M.Pd.', role: 'Dosen', status: 'pending', plan: 'gratis', personalApiKey: '' }
+            ];
+            saveUsers();
+        }
+
+        function saveUsers() {
+            localStorage.setItem('academic_ai_users', JSON.stringify(usersDb));
+        }
+
+        function persistCurrentUser() {
+            if (currentUser) localStorage.setItem('academic_ai_user', JSON.stringify(currentUser));
+        }
+
+        function getEffectiveApiKey() {
+            if (currentUser && currentUser.plan === 'berbayar' && currentUser.personalApiKey) return currentUser.personalApiKey;
+            return activeApiKey;
+        }
+
+        function renderUserMgmtTable() {
+            const tbody = document.getElementById('tblUsersBody');
+            if (!tbody) return;
+
+            if (usersDb.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-slate-400 text-xs">Belum ada pengguna terdaftar.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = usersDb.map(u => {
+                const isSelf = currentUser && currentUser.username === u.username;
+
+                const roleBadge = u.role === 'Admin'
+                    ? `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-brand-100 text-brand-700">Admin</span>`
+                    : `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600">Dosen</span>`;
+
+                const statusBadge = u.status === 'aktif'
+                    ? `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700">Aktif</span>`
+                    : `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-700">Pending</span>`;
+
+                const planBadge = u.plan === 'berbayar'
+                    ? `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-100 text-purple-700">Berbayar</span>`
+                    : `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600">Gratis</span>`;
+
+                const statusBtn = isSelf
+                    ? `<span class="text-[10px] text-slate-400 italic">Akun sendiri</span>`
+                    : `<button onclick="toggleUserStatus('${u.username}')" class="px-2 py-1 rounded-lg text-[10px] font-bold ${u.status === 'aktif' ? 'bg-amber-50 text-amber-700 hover:bg-amber-100' : 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100'} transition-all">
+                           <i class="fa-solid fa-power-off mr-1"></i>${u.status === 'aktif' ? 'Set Pending' : 'Aktifkan'}
+                       </button>`;
+
+                const planBtn = `<button onclick="toggleUserPlan('${u.username}')" class="px-2 py-1 rounded-lg text-[10px] font-bold ${u.plan === 'berbayar' ? 'bg-slate-100 text-slate-600 hover:bg-slate-200' : 'bg-purple-50 text-purple-700 hover:bg-purple-100'} transition-all">
+                        <i class="fa-solid fa-arrow-right-arrow-left mr-1"></i>${u.plan === 'berbayar' ? 'Ke Gratis' : 'Ke Berbayar'}
+                    </button>`;
+
+                const apiCell = u.plan === 'berbayar'
+                    ? `<div class="flex items-center gap-1.5">
+                           <input type="password" id="ukey_${u.username}" value="${u.personalApiKey || ''}" placeholder="AIzaSy... (khusus user ini)" class="flex-1 min-w-[150px] px-2.5 py-1.5 text-xs rounded-lg border border-slate-300 focus:ring-2 focus:ring-purple-400 outline-none">
+                           <button onclick="handleSetUserApiKey('${u.username}')" class="px-2.5 py-1.5 bg-purple-600 hover:bg-purple-700 text-white rounded-lg text-[10px] font-bold transition-all">Simpan</button>
+                       </div>`
+                    : `<span class="text-[11px] text-slate-400 italic">Pakai API key default (gratis)</span>`;
+
+                return `
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="py-3 px-3">
+                            <p class="font-semibold text-slate-700 text-xs">${u.nama_lengkap}${isSelf ? ' <span class="text-[9px] text-brand-600 font-bold">(Anda)</span>' : ''}</p>
+                            <p class="text-[11px] text-slate-400">@${u.username}</p>
+                        </td>
+                        <td class="py-3 px-3">${roleBadge}</td>
+                        <td class="py-3 px-3 text-center space-y-1.5">
+                            <div>${statusBadge}</div>
+                            ${statusBtn}
+                        </td>
+                        <td class="py-3 px-3 text-center space-y-1.5">
+                            <div>${planBadge}</div>
+                            ${planBtn}
+                        </td>
+                        <td class="py-3 px-3">${apiCell}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function toggleUserStatus(username) {
+            const rec = usersDb.find(x => x.username === username);
+            if (!rec) return;
+            if (currentUser && currentUser.username === username) {
+                showToast('Tidak dapat mengubah status akun sendiri!', 'error');
+                return;
+            }
+            rec.status = rec.status === 'aktif' ? 'pending' : 'aktif';
+            saveUsers();
+            renderUserMgmtTable();
+            showToast(`Akun @${username} kini ${rec.status === 'aktif' ? 'AKTIF' : 'PENDING'}.`, rec.status === 'aktif' ? 'success' : 'info');
+        }
+
+        function toggleUserPlan(username) {
+            const rec = usersDb.find(x => x.username === username);
+            if (!rec) return;
+            rec.plan = rec.plan === 'berbayar' ? 'gratis' : 'berbayar';
+            if (rec.plan === 'gratis') rec.personalApiKey = '';
+            saveUsers();
+            if (currentUser && currentUser.username === username) {
+                currentUser.plan = rec.plan;
+                currentUser.personalApiKey = rec.personalApiKey;
+                persistCurrentUser();
+            }
+            renderUserMgmtTable();
+            showToast(`Paket @${username} kini ${rec.plan === 'berbayar' ? 'BERBAYAR (AI Studio Premium, perlu API key pribadi)' : 'GRATIS (AI Studio Free, API key default)'}.`, 'success');
+        }
+
+        function handleSetUserApiKey(username) {
+            const input = document.getElementById('ukey_' + username);
+            if (!input) return;
+            const rec = usersDb.find(x => x.username === username);
+            if (!rec) return;
+            rec.personalApiKey = input.value.trim();
+            saveUsers();
+            if (currentUser && currentUser.username === username) {
+                currentUser.personalApiKey = rec.personalApiKey;
+                persistCurrentUser();
+            }
+            showToast(`API key pribadi @${username} tersimpan. Hanya user bersangkutan yang dapat melihatnya.`, 'success');
+        }
+
+        function renderAkunInfo() {
+            if (!currentUser) return;
+            document.getElementById('akunNama').innerText = currentUser.nama_lengkap;
+            document.getElementById('akunUsername').innerText = '@' + currentUser.username;
+            document.getElementById('akunRole').innerText = currentUser.role;
+            document.getElementById('akunStatus').innerHTML = currentUser.status === 'aktif'
+                ? `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700">Aktif</span>`
+                : `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-700">Pending</span>`;
+            document.getElementById('akunPaket').innerHTML = currentUser.plan === 'berbayar'
+                ? `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-100 text-purple-700">Berbayar / Premium</span>`
+                : `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600">Gratis</span>`;
+
+            const box = document.getElementById('akunApiBox');
+            if (currentUser.plan === 'berbayar') {
+                box.innerHTML = `
+                    <p class="font-bold text-slate-700"><i class="fa-solid fa-key text-purple-600 mr-1"></i> API Key Pribadi Anda (AI Studio Premium)</p>
+                    <div class="flex items-center gap-2">
+                        <input type="password" id="akunApiKeyField" readonly value="${currentUser.personalApiKey || ''}" placeholder="Belum diatur oleh admin" class="flex-1 px-3 py-2 text-xs rounded-lg border border-slate-300 bg-white outline-none font-mono">
+                        <button onclick="toggleRevealAkunKey()" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg text-xs font-bold text-slate-600 transition-all">
+                            <i id="akunKeyEye" class="fa-solid fa-eye"></i>
+                        </button>
+                    </div>
+                    ${currentUser.personalApiKey
+                        ? '<p class="text-[11px] text-emerald-700"><i class="fa-solid fa-circle-check mr-1"></i>Kunci ini privat — hanya akun Anda yang dapat melihatnya.</p>'
+                        : '<p class="text-[11px] text-amber-700"><i class="fa-solid fa-triangle-exclamation mr-1"></i>Admin belum mengatur API key pribadi untuk akun Anda.</p>'}
+                `;
+            } else {
+                box.innerHTML = `
+                    <p class="font-bold text-slate-700"><i class="fa-solid fa-circle-info text-sky-600 mr-1"></i> Paket Gratis</p>
+                    <p class="text-[11px] leading-relaxed">Akun Anda menggunakan <strong>API key default bersama</strong> (Google AI Studio versi gratis) yang dikelola terpusat oleh admin. Upgrade ke paket berbayar untuk mendapatkan API key premium pribadi.</p>
+                `;
+            }
+        }
+
+        function toggleRevealAkunKey() {
+            const field = document.getElementById('akunApiKeyField');
+            const eye = document.getElementById('akunKeyEye');
+            if (field.type === 'password') {
+                field.type = 'text';
+                eye.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                field.type = 'password';
+                eye.classList.replace('fa-eye-slash', 'fa-eye');
+            }
         }
 
         function showToast(msg, type = 'info') {
