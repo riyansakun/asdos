@@ -1,0 +1,1218 @@
+<!DOCTYPE html>
+<html lang="id" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AI Academic Suite - Platform Dosen Digital</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eep2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            800: '#3730a3',
+                            900: '#312e81'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            .print-only {
+                display: block !important;
+            }
+            body {
+                background: white !important;
+                color: black !important;
+            }
+            .print-container {
+                box-shadow: none !important;
+                border: none !important;
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+        }
+    </style>
+
+    <link rel="manifest" id="manifest-placeholder">
+    <script>
+        // Dynamic Manifest Injection
+        const manifestData = {
+            "name": "AI Academic Suite Dosen",
+            "short_name": "AcademicAI",
+            "description": "Platform AI Assistant Pembuatan RPS, Bahan Ajar, dan Soal Evaluasi Dosen",
+            "start_url": "./",
+            "display": "standalone",
+            "background_color": "#f8fafc",
+            "theme_color": "#4f46e5",
+            "icons": [
+                {
+                    "src": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' fill='%234f46e5'><rect width='512' height='512' rx='128' fill='%234f46e5'/><path d='M256 120L384 192V320L256 392L128 320V192L256 120Z' fill='white'/><path d='M256 192L320 228V284L256 320L192 284V228L256 192Z' fill='%23e0e7ff'/></svg>",
+                    "sizes": "192x192 512x512",
+                    "type": "image/svg+xml",
+                    "purpose": "any maskable"
+                }
+            ]
+        };
+        const stringManifest = JSON.stringify(manifestData);
+        const manifestBlob = new Blob([stringManifest], {type: 'application/json'});
+        const manifestURL = URL.createObjectURL(manifestBlob);
+        document.getElementById('manifest-placeholder').setAttribute('href', manifestURL);
+    </script>
+</head>
+<body class="h-full text-slate-800 bg-slate-50 flex flex-col custom-scrollbar">
+
+    <script>
+        // Embedded Offline Service Worker using Blob
+        const swCode = `
+            const CACHE_NAME = 'academic-ai-v1';
+            const ASSETS = [
+                './',
+                'https://cdn.tailwindcss.com',
+                'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
+                'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap'
+            ];
+
+            self.addEventListener('install', (e) => {
+                e.waitUntil(
+                    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
+                );
+                self.skipWaiting();
+            });
+
+            self.addEventListener('activate', (e) => {
+                e.waitUntil(
+                    caches.keys().then((keys) => {
+                        return Promise.all(
+                            keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
+                        );
+                    })
+                );
+                self.clients.claim();
+            });
+
+            self.addEventListener('fetch', (e) => {
+                if (e.request.method !== 'GET') return;
+                e.respondWith(
+                    caches.match(e.request).then((cachedResponse) => {
+                        if (cachedResponse) return cachedResponse;
+                        return fetch(e.request).then((response) => {
+                            if (!response || response.status !== 200 || response.type !== 'basic') {
+                                return response;
+                            }
+                            const responseToCache = response.clone();
+                            caches.open(CACHE_NAME).then((cache) => cache.put(e.request, responseToCache));
+                            return response;
+                        }).catch(() => {
+                            return new Response('<div style="padding:20px;text-align:center;font-family:sans-serif;"><h3>Anda sedang Offline</h3><p>Aplikasi berjalan dalam mode terisolasi offline.</p></div>', {
+                                headers: { 'Content-Type': 'text/html' }
+                            });
+                        });
+                    })
+                );
+            });
+        `;
+        
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                const blob = new Blob([swCode], { type: 'text/javascript' });
+                const blobURL = URL.createObjectURL(blob);
+                navigator.serviceWorker.register(blobURL)
+                    .then(reg => console.log('Service Worker Registered'))
+                    .catch(err => console.log('Service Worker Registration Failed', err));
+            });
+        }
+    </script>
+
+    <div id="toastContainer" class="fixed top-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <div id="appRoot" class="min-h-screen flex flex-col">
+        <!-- Top Navbar -->
+        <header id="mainHeader" class="hidden no-print sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-slate-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between h-16">
+                    <div class="flex items-center gap-3">
+                        <button id="btnToggleSidebar" class="p-2 rounded-lg text-slate-600 hover:bg-slate-100 lg:hidden">
+                            <i class="fa-solid fa-bars text-lg"></i>
+                        </button>
+                        <div class="flex items-center gap-2">
+                            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-500 flex items-center justify-center text-white shadow-md shadow-brand-500/20">
+                                <i class="fa-solid fa-graduation-cap text-lg"></i>
+                            </div>
+                            <div>
+                                <h1 class="font-bold text-slate-800 text-base leading-tight">Academic AI Suite</h1>
+                                <p class="text-xs text-slate-500 font-medium">Asisten Dosen & Kurikulum</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Header Items -->
+                    <div class="flex items-center gap-3">
+                        <!-- PWA Install Button -->
+                        <button id="pwaInstallBtn" class="hidden items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition-all">
+                            <i class="fa-solid fa-download"></i>
+                            <span>Install App</span>
+                        </button>
+
+                        <!-- User Profile Menu -->
+                        <div class="flex items-center gap-3 pl-3 border-l border-slate-200">
+                            <div class="text-right hidden sm:block">
+                                <p id="lblUserFullName" class="text-sm font-semibold text-slate-700">Dosen Pengajar</p>
+                                <span id="lblUserRole" class="inline-block px-2 py-0.5 text-[10px] font-medium bg-brand-100 text-brand-700 rounded-full">Dosen</span>
+                            </div>
+                            <button id="btnLogout" class="p-2 rounded-lg text-rose-600 hover:bg-rose-50 transition-colors" title="Keluar">
+                                <i class="fa-solid fa-right-from-bracket text-base"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="flex-1 flex overflow-hidden">
+            <!-- Sidebar Navigation -->
+            <aside id="mainSidebar" class="hidden no-print fixed inset-y-0 left-0 z-40 w-64 bg-white border-r border-slate-200 flex-col transition-transform duration-300 lg:static lg:translate-x-0">
+                <div class="p-4 border-b border-slate-100 flex justify-between items-center lg:hidden">
+                    <span class="font-bold text-slate-800">Menu Utama</span>
+                    <button id="btnCloseSidebar" class="p-1 text-slate-400 hover:text-slate-600">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
+                </div>
+                
+                <div class="p-4 space-y-1 overflow-y-auto flex-1">
+                    <button data-target="secDashboard" class="nav-btn active w-full flex items-center gap-3 px-3.5 py-2.5 text-sm font-medium rounded-xl transition-all text-brand-600 bg-brand-50 font-semibold">
+                        <i class="fa-solid fa-chart-pie w-5 text-center"></i>
+                        <span>Dashboard</span>
+                    </button>
+                    
+                    <button data-target="secRPS" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 text-sm font-medium rounded-xl text-slate-600 hover:bg-slate-100 transition-all">
+                        <i class="fa-solid fa-book-bookmark w-5 text-center text-indigo-500"></i>
+                        <span>AI RPS Generator</span>
+                    </button>
+
+                    <button data-target="secBahanAjar" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 text-sm font-medium rounded-xl text-slate-600 hover:bg-slate-100 transition-all">
+                        <i class="fa-solid fa-file-lines w-5 text-center text-emerald-500"></i>
+                        <span>AI Bahan Ajar</span>
+                    </button>
+
+                    <button data-target="secSoal" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 text-sm font-medium rounded-xl text-slate-600 hover:bg-slate-100 transition-all">
+                        <i class="fa-solid fa-[#f59e0b] fa-list-check w-5 text-center text-amber-500"></i>
+                        <span>AI Soal & Evaluasi</span>
+                    </button>
+
+                    <button data-target="secVault" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 text-sm font-medium rounded-xl text-slate-600 hover:bg-slate-100 transition-all">
+                        <i class="fa-solid fa-box-archive w-5 text-center text-blue-500"></i>
+                        <span>Riwayat Dokumen</span>
+                    </button>
+
+                    <div class="pt-4 mt-4 border-t border-slate-100">
+                        <p class="px-3 text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2">Administrasi</p>
+                        <button id="navAdminSettings" data-target="secAdmin" class="nav-btn hidden w-full flex items-center gap-3 px-3.5 py-2.5 text-sm font-medium rounded-xl text-slate-600 hover:bg-slate-100 transition-all">
+                            <i class="fa-solid fa-sliders w-5 text-center text-purple-500"></i>
+                            <span>Pengaturan API & User</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Footer Status -->
+                <div class="p-4 border-t border-slate-100 text-xs text-slate-500 bg-slate-50">
+                    <div class="flex items-center justify-between mb-1">
+                        <span>Mode Sistem:</span>
+                        <span id="badgeSystemMode" class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800">Preview</span>
+                    </div>
+                    <p class="text-[10px] text-slate-400">Versi 2.4.0 • Full Offline PWA</p>
+                </div>
+            </aside>
+
+            <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 custom-scrollbar">
+
+                <!-- SECTION LOGIN (Visible Default) -->
+                <section id="secLogin" class="max-w-md mx-auto my-12 bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
+                    <div class="p-6 sm:p-8">
+                        <div class="text-center mb-6">
+                            <div class="w-16 h-16 bg-brand-600 rounded-2xl mx-auto flex items-center justify-center text-white text-2xl shadow-lg shadow-brand-500/30 mb-3">
+                                <i class="fa-solid fa-graduation-cap"></i>
+                            </div>
+                            <h2 class="text-2xl font-bold text-slate-800">Academic AI Suite</h2>
+                            <p class="text-sm text-slate-500 mt-1">Masuk untuk mengakses layanan AI Dosen</p>
+                        </div>
+
+                        <form id="frmLogin" onsubmit="handleLoginSubmit(event)" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Username</label>
+                                <div class="relative">
+                                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                                        <i class="fa-solid fa-user text-sm"></i>
+                                    </span>
+                                    <input type="text" id="txtUsername" required class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-sm outline-none transition-all" placeholder="Masukkan username">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Password</label>
+                                <div class="relative">
+                                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                                        <i class="fa-solid fa-lock text-sm"></i>
+                                    </span>
+                                    <input type="password" id="txtPassword" required class="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-sm outline-none transition-all" placeholder="••••••••">
+                                </div>
+                            </div>
+
+                            <button type="submit" id="btnLoginSubmit" class="w-full py-3 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-xl shadow-lg shadow-brand-600/25 transition-all text-sm flex items-center justify-center gap-2">
+                                <span>Masuk Aplikasi</span>
+                                <i class="fa-solid fa-arrow-right text-xs"></i>
+                            </button>
+                        </form>
+
+                        <div class="mt-6 p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600">
+                            <p class="font-bold mb-1 text-slate-700"><i class="fa-solid fa-circle-info text-brand-600 mr-1"></i> Akun Pengujian Demo:</p>
+                            <ul class="space-y-0.5 text-[11px] list-disc list-inside">
+                                <li><strong>Admin:</strong> admin / edudigital</li>
+                                <li><strong>Dosen:</strong> dosen / edudigital</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECTION DASHBOARD -->
+                <section id="secDashboard" class="content-section hidden space-y-6">
+                    <!-- Banner Info -->
+                    <div class="bg-gradient-to-r from-brand-600 to-indigo-700 rounded-2xl p-6 text-white shadow-xl shadow-brand-600/10 relative overflow-hidden">
+                        <div class="relative z-10 max-w-2xl">
+                            <span class="px-3 py-1 rounded-full bg-white/20 text-xs font-medium tracking-wide backdrop-blur-md">Generatif AI Akademik v2.4</span>
+                            <h2 class="text-2xl sm:text-3xl font-extrabold mt-2">Selamat Datang di Portal Dosen Digital</h2>
+                            <p class="text-brand-100 text-sm mt-1 leading-relaxed">Kelola penyusunan Rencana Pembelajaran Semester (RPS), Modul Bahan Ajar, dan Bank Soal Evaluasi terstruktur secara presisi dalam hitungan detik.</p>
+                        </div>
+                        <div class="absolute -right-8 -bottom-12 opacity-15 text-[180px] pointer-events-none">
+                            <i class="fa-solid fa-brain"></i>
+                        </div>
+                    </div>
+
+                    <!-- Statistics Cards -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div class="p-5 bg-white rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total RPS Dibuat</p>
+                                <h3 id="statTotalRPS" class="text-2xl font-black text-slate-800 mt-1">0</h3>
+                            </div>
+                            <div class="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-book-bookmark"></i>
+                            </div>
+                        </div>
+
+                        <div class="p-5 bg-white rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Bahan Ajar Tergenerate</p>
+                                <h3 id="statTotalBahanAjar" class="text-2xl font-black text-slate-800 mt-1">0</h3>
+                            </div>
+                            <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-file-circle-check"></i>
+                            </div>
+                        </div>
+
+                        <div class="p-5 bg-white rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Set Soal Evaluasi</p>
+                                <h3 id="statTotalSoal" class="text-2xl font-black text-slate-800 mt-1">0</h3>
+                            </div>
+                            <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-list-check"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Action Cards -->
+                    <h3 class="text-base font-bold text-slate-800 pt-2">Akses Cepat Generator AI</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                        <div onclick="switchSection('secRPS')" class="p-6 bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-brand-300 transition-all cursor-pointer group">
+                            <div class="w-12 h-12 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition-transform">
+                                <i class="fa-solid fa-layer-group"></i>
+                            </div>
+                            <h4 class="font-bold text-slate-800 text-base mb-1">AI RPS Generator</h4>
+                            <p class="text-xs text-slate-500 leading-relaxed">Susun Matriks Kurikulum 16 Pertemuan, CPL, CPMK, Indikator & Bobot Penilaian otomatis.</p>
+                        </div>
+
+                        <div onclick="switchSection('secBahanAjar')" class="p-6 bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-brand-300 transition-all cursor-pointer group">
+                            <div class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition-transform">
+                                <i class="fa-solid fa-file-pen"></i>
+                            </div>
+                            <h4 class="font-bold text-slate-800 text-base mb-1">AI Bahan Ajar</h4>
+                            <p class="text-xs text-slate-500 leading-relaxed">Buat Modul Pembelajaran terstruktur, ringkasan eksekutif, atau skrip slide presentasi.</p>
+                        </div>
+
+                        <div onclick="switchSection('secSoal')" class="p-6 bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-brand-300 transition-all cursor-pointer group">
+                            <div class="w-12 h-12 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition-transform">
+                                <i class="fa-solid fa-[#f59e0b] fa-file-circle-question"></i>
+                            </div>
+                            <h4 class="font-bold text-slate-800 text-base mb-1">AI Soal & Evaluasi</h4>
+                            <p class="text-xs text-slate-500 leading-relaxed">Generasi paket bank soal Taksonomi Bloom (C1-C6) dilengkapi kunci dan rubrik jawaban.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="secRPS" class="content-section hidden space-y-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h2 class="text-xl font-bold text-slate-800">AI RPS Generator</h2>
+                            <p class="text-xs text-slate-500">Buat Matriks Rencana Pembelajaran Semester Terstandar Standar Nasional Pendidikan Tinggi (SN-Dikti)</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                        <!-- Input Form Card -->
+                        <div class="lg:col-span-5 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                            <h3 class="font-bold text-sm text-slate-700 border-b pb-2"><i class="fa-solid fa-sliders text-brand-600 mr-2"></i> Parameter Mata Kuliah</h3>
+                            
+                            <form id="frmGenerateRPS" onsubmit="handleGenerateRPS(event)" class="space-y-3.5">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-600 mb-1">Nama Mata Kuliah</label>
+                                    <input type="text" id="rpsMatkul" required class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500 outline-none" placeholder="Contoh: Kecerdasan Buatan">
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-xs font-semibold text-slate-600 mb-1">Kode MK</label>
+                                        <input type="text" id="rpsKode" required class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500 outline-none" placeholder="IF302">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-semibold text-slate-600 mb-1">Bobot SKS / Sem</label>
+                                        <input type="text" id="rpsSks" required class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500 outline-none" placeholder="3 SKS / Sem 5">
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-600 mb-1">Capaian Pembelajaran Lulusan (CPL)</label>
+                                    <textarea id="rpsCPL" rows="2" required class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500 outline-none" placeholder="Mampu merancang dan mengimplementasikan algoritma sistem cerdas..."></textarea>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-600 mb-1">Capaian Pembelajaran Mata Kuliah (CPMK)</label>
+                                    <textarea id="rpsCPMK" rows="2" required class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500 outline-none" placeholder="Mahasiswa mampu menganalisis permasalahan machine learning..."></textarea>
+                                </div>
+
+                                <button type="submit" id="btnGenRPS" class="w-full py-2.5 bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm rounded-xl shadow-md transition-all flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                                    <span>Generate RPS Lengkap</span>
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Output Preview Card -->
+                        <div class="lg:col-span-7 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col">
+                            <div class="flex items-center justify-between border-b pb-3 mb-3">
+                                <h3 class="font-bold text-sm text-slate-700"><i class="fa-solid fa-table text-indigo-600 mr-2"></i> Hasil Output Matriks RPS</h3>
+                                <div id="rpsActionBtns" class="hidden items-center gap-2">
+                                    <button onclick="printRPSResult()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-lg transition-all flex items-center gap-1.5">
+                                        <i class="fa-solid fa-print"></i> Cetak / PDF
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div id="rpsOutputBox" class="flex-1 overflow-y-auto max-h-[550px] custom-scrollbar rounded-xl bg-slate-50 p-4 border border-slate-200">
+                                <div class="text-center py-16 text-slate-400">
+                                    <i class="fa-solid fa-file-circle-plus text-4xl mb-2 text-slate-300"></i>
+                                    <p class="text-sm">Isi parameter di sebelah kiri lalu klik "Generate RPS Lengkap"</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="secBahanAjar" class="content-section hidden space-y-6">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-800">AI Bahan Ajar & Modul</h2>
+                        <p class="text-xs text-slate-500">Susun Ringkasan Materi, Buku Modul Pembelajaran, atau Draft Slide Kuliah secara Cepat</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                        <div class="lg:col-span-5 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                            <h3 class="font-bold text-sm text-slate-700 border-b pb-2"><i class="fa-solid fa-sliders text-emerald-600 mr-2"></i> Konfigurasi Modul</h3>
+                            
+                            <form id="frmGenerateModul" onsubmit="handleGenerateModul(event)" class="space-y-3.5">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-600 mb-1">Topik Utama / Pokok Bahasan</label>
+                                    <input type="text" id="modulTopik" required class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="Contoh: Supervised Learning & Regresi Linear">
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-600 mb-1">Target Pertemuan Ke-</label>
+                                    <input type="text" id="modulPertemuan" required class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="Pertemuan ke-3 dan ke-4">
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-600 mb-1">Format Luaran Bahan Ajar</label>
+                                    <select id="modulFormat" class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-500 outline-none bg-white">
+                                        <option value="Modul Lengkap Bab">Modul Lengkap Bab (Penjelasan + Contoh Case + Latihan)</option>
+                                        <option value="Ringkasan Eksekutif">Ringkasan Eksekutif / Executive Summary</option>
+                                        <option value="Draft Slide Presentasi">Draft Skrip Slide Presentasi Dosen (Point-by-point)</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-600 mb-1">Catatan Khusus / Kedalaman Materi</label>
+                                    <textarea id="modulCatatan" rows="2" class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-500 outline-none" placeholder="Sertakan studi kasus di bidang industri kesehatan..."></textarea>
+                                </div>
+
+                                <button type="submit" id="btnGenModul" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl shadow-md transition-all flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                                    <span>Generate Bahan Ajar</span>
+                                </button>
+                            </form>
+                        </div>
+
+                        <div class="lg:col-span-7 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col">
+                            <div class="flex items-center justify-between border-b pb-3 mb-3">
+                                <h3 class="font-bold text-sm text-slate-700"><i class="fa-solid fa-file-lines text-emerald-600 mr-2"></i> Teks Bahan Ajar</h3>
+                                <div id="modulActionBtns" class="hidden items-center gap-2">
+                                    <button onclick="copyModulText()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-lg transition-all flex items-center gap-1.5">
+                                        <i class="fa-solid fa-copy"></i> Salin Teks
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div id="modulOutputBox" class="flex-1 overflow-y-auto max-h-[550px] custom-scrollbar rounded-xl bg-slate-50 p-5 border border-slate-200 text-sm leading-relaxed">
+                                <div class="text-center py-16 text-slate-400">
+                                    <i class="fa-solid fa-align-left text-4xl mb-2 text-slate-300"></i>
+                                    <p class="text-sm">Konfigurasi topik modul dan tekan "Generate Bahan Ajar"</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="secSoal" class="content-section hidden space-y-6">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-800">AI Soal & Evaluasi</h2>
+                        <p class="text-xs text-slate-500">Buat Bank Soal Ujian (UTS/UAS/Kuis) Sesuai Taksonomi Bloom (C1 - C6) Lengkap Kunci Jawabannya</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                        <div class="lg:col-span-5 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                            <h3 class="font-bold text-sm text-slate-700 border-b pb-2"><i class="fa-solid fa-sliders text-amber-600 mr-2"></i> Parametrisasi Evaluasi</h3>
+                            
+                            <form id="frmGenerateSoal" onsubmit="handleGenerateSoal(event)" class="space-y-3.5">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-600 mb-1">Materi / Topik Evaluasi</label>
+                                    <input type="text" id="soalTopik" required class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-500 outline-none" placeholder="Contoh: Neural Networks & Backpropagation">
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-xs font-semibold text-slate-600 mb-1">Tipe Soal</label>
+                                        <select id="soalTipe" class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-500 outline-none bg-white">
+                                            <option value="Pilihan Ganda">Pilihan Ganda (PG)</option>
+                                            <option value="Essay Analytic">Essay Analitis / Studi Kasus</option>
+                                            <option value="Kombinasi PG & Essay">Kombinasi PG & Essay</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-semibold text-slate-600 mb-1">Jumlah Soal</label>
+                                        <input type="number" id="soalJumlah" min="1" max="20" value="5" required class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-500 outline-none">
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-600 mb-1">Tingkat Kesukaran (Taksonomi Bloom)</label>
+                                    <select id="soalBloom" class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-500 outline-none bg-white">
+                                        <option value="C1-C2 (Mengingat & Memahami)">Level Rendah (C1-C2: Mengingat & Memahami)</option>
+                                        <option value="C3-C4 (Menerapkan & Menganalisis)">Level Menengah (C3-C4: Menerapkan & Menganalisis)</option>
+                                        <option value="C5-C6 (Mengevaluasi & Mencipta)">Level Tinggi / HOTS (C5-C6: Mengevaluasi & Mencipta)</option>
+                                    </select>
+                                </div>
+
+                                <button type="submit" id="btnGenSoal" class="w-full py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-bold text-sm rounded-xl shadow-md transition-all flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                                    <span>Generate Set Soal</span>
+                                </button>
+                            </form>
+                        </div>
+
+                        <div class="lg:col-span-7 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col">
+                            <div class="flex items-center justify-between border-b pb-3 mb-3">
+                                <h3 class="font-bold text-sm text-slate-700"><i class="fa-solid fa-list-check text-amber-600 mr-2"></i> Draft Soal & Rubrik</h3>
+                                <div id="soalActionBtns" class="hidden items-center gap-2">
+                                    <button onclick="printSoalResult()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-lg transition-all flex items-center gap-1.5">
+                                        <i class="fa-solid fa-print"></i> Cetak Lembar Ujian
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div id="soalOutputBox" class="flex-1 overflow-y-auto max-h-[550px] custom-scrollbar rounded-xl bg-slate-50 p-5 border border-slate-200 space-y-4">
+                                <div class="text-center py-16 text-slate-400">
+                                    <i class="fa-solid fa-circle-question text-4xl mb-2 text-slate-300"></i>
+                                    <p class="text-sm">Tentukan parameter evaluasi dan klik "Generate Set Soal"</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="secVault" class="content-section hidden space-y-6">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-xl font-bold text-slate-800">Riwayat Dokumen (Document Vault)</h2>
+                            <p class="text-xs text-slate-500">Arsip Seluruh Dokumen RPS, Bahan Ajar, dan Soal yang Telah Di-generate</p>
+                        </div>
+                        
+                        <div class="flex items-center gap-2">
+                            <input type="text" id="txtSearchVault" onkeyup="filterVaultDocs()" placeholder="Cari dokumen..." class="px-3.5 py-1.5 text-xs rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500 outline-none w-48 sm:w-64">
+                            <select id="selFilterType" onchange="filterVaultDocs()" class="px-3 py-1.5 text-xs rounded-xl border border-slate-300 focus:ring-2 focus:ring-brand-500 outline-none bg-white">
+                                <option value="ALL">Semua Jenis</option>
+                                <option value="RPS">RPS</option>
+                                <option value="BAHAN_AJAR">Bahan Ajar</option>
+                                <option value="SOAL">Soal Evaluasi</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm">
+                                <thead class="bg-slate-50 border-b border-slate-200 text-xs text-slate-500 uppercase tracking-wider">
+                                    <tr>
+                                        <th class="py-3 px-4">Tipe Dokumen</th>
+                                        <th class="py-3 px-4">Judul / Topik</th>
+                                        <th class="py-3 px-4">Tanggal Buat</th>
+                                        <th class="py-3 px-4 text-center">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tblVaultBody" class="divide-y divide-slate-100">
+                                    <tr>
+                                        <td colspan="4" class="py-8 text-center text-slate-400 text-xs">Belum ada riwayat dokumen tersimpan.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="secAdmin" class="content-section hidden space-y-6">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-800">Pengaturan Sistem & Pengelola User</h2>
+                        <p class="text-xs text-slate-500">Konfigurasi Kunci API AI Google Gemini dan Kelola Akun Dosen Pengguna</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- AI Settings Card -->
+                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                            <h3 class="font-bold text-sm text-slate-700 border-b pb-2"><i class="fa-solid fa-key text-purple-600 mr-2"></i> Konfigurasi Gemini API Key</h3>
+                            
+                            <form id="frmSaveApiKey" onsubmit="handleSaveApiKey(event)" class="space-y-3">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-600 mb-1">Google Gemini API Key</label>
+                                    <input type="password" id="txtApiKey" class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-purple-500 outline-none" placeholder="AIzaSy...">
+                                    <p class="text-[11px] text-slate-400 mt-1">Kunci API digunakan untuk terhubung secara langsung ke model generatif Gemini.</p>
+                                </div>
+
+                                <button type="submit" class="py-2 px-4 bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs rounded-xl shadow-md transition-all">
+                                    Simpan Key API
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- User Management Card -->
+                        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                            <h3 class="font-bold text-sm text-slate-700 border-b pb-2"><i class="fa-solid fa-users text-brand-600 mr-2"></i> Tambah Pengguna Dosen</h3>
+                            
+                            <form id="frmAddUser" onsubmit="handleAddUser(event)" class="space-y-3">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-600 mb-1">Nama Lengkap Dosen</label>
+                                    <input type="text" id="newNama" required class="w-full px-3.5 py-1.5 text-sm rounded-xl border border-slate-300 outline-none">
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-xs font-semibold text-slate-600 mb-1">Username</label>
+                                        <input type="text" id="newUsername" required class="w-full px-3.5 py-1.5 text-sm rounded-xl border border-slate-300 outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-semibold text-slate-600 mb-1">Password</label>
+                                        <input type="password" id="newPassword" required class="w-full px-3.5 py-1.5 text-sm rounded-xl border border-slate-300 outline-none">
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="py-2 px-4 bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs rounded-xl shadow-md transition-all">
+                                    Tambah Akun
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+    <div id="modalPreviewDoc" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-3xl w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+                <h3 id="modalDocTitle" class="font-bold text-slate-800 text-base">Detail Dokumen</h3>
+                <button onclick="closeModalDoc()" class="text-slate-400 hover:text-slate-600 p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <div id="modalDocBody" class="p-6 overflow-y-auto flex-1 custom-scrollbar text-sm leading-relaxed">
+                <!-- Preview Content Injected Here -->
+            </div>
+            <div class="px-6 py-3 bg-slate-50 border-t border-slate-200 flex justify-end gap-2">
+                <button onclick="closeModalDoc()" class="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-200 rounded-xl">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* 
+           ==================================================
+           KONFIGURASI SISTEM APLIKASI
+           ==================================================
+        */
+        // UBAH IS_PREVIEW KE false JIKA SUDAH DI-DEPLOY DAN DI-HUBUNGKAN KE GAS BACKEND
+        const IS_PREVIEW = true; 
+
+        // State Global Aplikasi
+        let currentUser = null;
+        let documentVault = [];
+        let deferredPrompt = null;
+        let activeApiKey = "";
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initApp();
+        });
+
+        function initApp() {
+            // Update UI mode status
+            const badge = document.getElementById('badgeSystemMode');
+            if (badge) {
+                badge.innerText = IS_PREVIEW ? "Preview Mode" : "GAS Backend";
+                badge.className = IS_PREVIEW 
+                    ? "px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800"
+                    : "px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800";
+            }
+
+            // PWA Install prompt binding
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                const pwaBtn = document.getElementById('pwaInstallBtn');
+                if (pwaBtn) pwaBtn.classList.remove('hidden');
+            });
+
+            document.getElementById('pwaInstallBtn')?.addEventListener('click', async () => {
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
+                    if (outcome === 'accepted') {
+                        document.getElementById('pwaInstallBtn').classList.add('hidden');
+                    }
+                    deferredPrompt = null;
+                }
+            });
+
+            // Bind Sidebar Toggle
+            document.getElementById('btnToggleSidebar')?.addEventListener('click', () => {
+                const sb = document.getElementById('mainSidebar');
+                sb.classList.remove('hidden', '-translate-x-full');
+                sb.classList.add('flex');
+            });
+
+            document.getElementById('btnCloseSidebar')?.addEventListener('click', () => {
+                const sb = document.getElementById('mainSidebar');
+                sb.classList.add('hidden');
+            });
+
+            // Bind Navigation Tabs
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const target = btn.getAttribute('data-target');
+                    if (target) switchSection(target);
+                });
+            });
+
+            document.getElementById('btnLogout')?.addEventListener('click', handleLogout);
+
+            // Load Dummy or Session User
+            const savedUser = localStorage.getItem('academic_ai_user');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                setupUserSession();
+            }
+        }
+
+        function switchSection(sectionId) {
+            document.querySelectorAll('.content-section').forEach(sec => sec.classList.add('hidden'));
+            const targetSec = document.getElementById(sectionId);
+            if (targetSec) targetSec.classList.remove('hidden');
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                if (btn.getAttribute('data-target') === sectionId) {
+                    btn.classList.add('text-brand-600', 'bg-brand-50', 'font-semibold');
+                    btn.classList.remove('text-slate-600');
+                } else {
+                    btn.classList.remove('text-brand-600', 'bg-brand-50', 'font-semibold');
+                    btn.classList.add('text-slate-600');
+                }
+            });
+
+            // Close sidebar mobile when section clicked
+            if (window.innerWidth < 1024) {
+                document.getElementById('mainSidebar').classList.add('hidden');
+            }
+        }
+
+        function handleLoginSubmit(e) {
+            e.preventDefault();
+            const u = document.getElementById('txtUsername').value.trim();
+            const p = document.getElementById('txtPassword').value.trim();
+
+            showToast('Memverifikasi akun...', 'info');
+
+            if (IS_PREVIEW) {
+                // Dummy Authentication Logic
+                setTimeout(() => {
+                    if (u === 'admin' && p === 'edudigital') {
+                        currentUser = { username: 'admin', nama_lengkap: 'Dr. Administrator M.Kom', role: 'Admin' };
+                        setupUserSession();
+                        showToast('Berhasil login sebagai Admin!', 'success');
+                    } else if (u === 'dosen' && p === 'edudigital') {
+                        currentUser = { username: 'dosen', nama_lengkap: 'Dr. Budi Santoso, M.T.', role: 'Dosen' };
+                        setupUserSession();
+                        showToast('Berhasil login sebagai Dosen!', 'success');
+                    } else {
+                        showToast('Username atau password salah!', 'error');
+                    }
+                }, 500);
+            } else {
+                // Real Google Apps Script Backend Call
+                google.script.run
+                    .withSuccessHandler((res) => {
+                        if (res.success) {
+                            currentUser = res.user;
+                            setupUserSession();
+                            showToast('Login Berhasil!', 'success');
+                        } else {
+                            showToast(res.message || 'Login gagal', 'error');
+                        }
+                    })
+                    .withFailureHandler((err) => showToast('Error Server: ' + err.message, 'error'))
+                    .checkLogin(u, p);
+            }
+        }
+
+        function setupUserSession() {
+            localStorage.setItem('academic_ai_user', JSON.stringify(currentUser));
+            document.getElementById('secLogin').classList.add('hidden');
+            document.getElementById('mainHeader').classList.remove('hidden');
+            document.getElementById('mainSidebar').classList.remove('hidden');
+            document.getElementById('mainSidebar').classList.add('flex');
+
+            document.getElementById('lblUserFullName').innerText = currentUser.nama_lengkap;
+            document.getElementById('lblUserRole').innerText = currentUser.role;
+
+            if (currentUser.role === 'Admin') {
+                document.getElementById('navAdminSettings').classList.remove('hidden');
+            }
+
+            switchSection('secDashboard');
+            loadInitialData();
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('academic_ai_user');
+            currentUser = null;
+            document.getElementById('mainHeader').classList.add('hidden');
+            document.getElementById('mainSidebar').classList.add('hidden');
+            document.querySelectorAll('.content-section').forEach(s => s.classList.add('hidden'));
+            document.getElementById('secLogin').classList.remove('hidden');
+            showToast('Anda telah keluar.', 'info');
+        }
+
+        function loadInitialData() {
+            if (IS_PREVIEW) {
+                // Dummy Initial Documents
+                documentVault = [
+                    { id: 'rps_1', type: 'RPS', title: 'RPS Kecerdasan Buatan', date: '2026-09-15', content: '<h3>RPS Kecerdasan Buatan (3 SKS)</h3><p>CPMK: Mahasiswa mampu membuat model AI...</p>' },
+                    { id: 'mod_1', type: 'BAHAN_AJAR', title: 'Modul Regresi Linear Machine Learning', date: '2026-09-18', content: '<h3>Modul 1: Regresi Linear</h3><p>Penjelasan komprehensif mengenai estimasi parameter...</p>' },
+                    { id: 'soal_1', type: 'SOAL', title: 'Bank Soal Evaluasi Neural Networks', date: '2026-09-20', content: '<h3>Soal UTS Neural Networks</h3><p>1. Jelaskan fungsi aktivasi ReLU...</p>' }
+                ];
+                renderVaultTable(documentVault);
+                updateStats();
+            } else {
+                google.script.run
+                    .withSuccessHandler((data) => {
+                        documentVault = data || [];
+                        renderVaultTable(documentVault);
+                        updateStats();
+                    })
+                    .getVaultHistory();
+            }
+        }
+
+        function updateStats() {
+            const totalRPS = documentVault.filter(d => d.type === 'RPS').length;
+            const totalModul = documentVault.filter(d => d.type === 'BAHAN_AJAR').length;
+            const totalSoal = documentVault.filter(d => d.type === 'SOAL').length;
+
+            document.getElementById('statTotalRPS').innerText = totalRPS;
+            document.getElementById('statTotalBahanAjar').innerText = totalModul;
+            document.getElementById('statTotalSoal').innerText = totalSoal;
+        }
+
+        function handleGenerateRPS(e) {
+            e.preventDefault();
+            const matkul = document.getElementById('rpsMatkul').value;
+            const kode = document.getElementById('rpsKode').value;
+            const sks = document.getElementById('rpsSks').value;
+            const cpl = document.getElementById('rpsCPL').value;
+            const cpmk = document.getElementById('rpsCPMK').value;
+
+            const btn = document.getElementById('btnGenRPS');
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Generating RPS...`;
+
+            setTimeout(() => {
+                const rpsHtml = `
+                    <div class="space-y-4 print-container bg-white p-6 rounded-xl text-slate-800">
+                        <div class="text-center border-b-2 border-slate-800 pb-3">
+                            <h2 class="text-lg font-bold uppercase tracking-wide">Rencana Pembelajaran Semester (RPS)</h2>
+                            <h3 class="text-base font-semibold text-brand-700">${matkul} (${kode})</h3>
+                            <p class="text-xs text-slate-600">Bobot: ${sks}</p>
+                        </div>
+
+                        <div class="space-y-2 text-xs">
+                            <p><strong>CPL:</strong> ${cpl}</p>
+                            <p><strong>CPMK:</strong> ${cpmk}</p>
+                        </div>
+
+                        <table class="w-full text-xs border-collapse border border-slate-300 mt-4">
+                            <thead>
+                                <tr class="bg-slate-100 text-center font-bold">
+                                    <th class="border border-slate-300 p-2">Mgg Ke-</th>
+                                    <th class="border border-slate-300 p-2">Kemampuan Akhir (Sub-CPMK)</th>
+                                    <th class="border border-slate-300 p-2">Bahan Kajian (Materi)</th>
+                                    <th class="border border-slate-300 p-2">Metode Pembelajaran</th>
+                                    <th class="border border-slate-300 p-2">Bobot (%)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="border border-slate-300 p-2 text-center">1 - 2</td>
+                                    <td class="border border-slate-300 p-2">Memahami fondasi konsep ${matkul}</td>
+                                    <td class="border border-slate-300 p-2">Pengantar & Arsitektur Utama ${matkul}</td>
+                                    <td class="border border-slate-300 p-2">Kuliah Interaktif & Diskusi</td>
+                                    <td class="border border-slate-300 p-2 text-center">10%</td>
+                                </tr>
+                                <tr>
+                                    <td class="border border-slate-300 p-2 text-center">3 - 7</td>
+                                    <td class="border border-slate-300 p-2">Menganalisis algoritma dan studi kasus</td>
+                                    <td class="border border-slate-300 p-2">Metodologi Pemrosesan & Pemodelan Data</td>
+                                    <td class="border border-slate-300 p-2">Problem Based Learning (PBL)</td>
+                                    <td class="border border-slate-300 p-2 text-center">30%</td>
+                                </tr>
+                                <tr>
+                                    <td class="border border-slate-300 p-2 text-center">8</td>
+                                    <td class="border border-slate-300 p-2 text-center font-bold" colspan="3">Ujian Tengah Semester (UTS)</td>
+                                    <td class="border border-slate-300 p-2 text-center">20%</td>
+                                </tr>
+                                <tr>
+                                    <td class="border border-slate-300 p-2 text-center">9 - 15</td>
+                                    <td class="border border-slate-300 p-2">Mengimplementasikan proyek praktis ${matkul}</td>
+                                    <td class="border border-slate-300 p-2">Pengembangan Proyek Solutif Terapan</td>
+                                    <td class="border border-slate-300 p-2">Project Based Learning (PjBL)</td>
+                                    <td class="border border-slate-300 p-2 text-center">25%</td>
+                                </tr>
+                                <tr>
+                                    <td class="border border-slate-300 p-2 text-center">16</td>
+                                    <td class="border border-slate-300 p-2 text-center font-bold" colspan="3">Ujian Akhir Semester (UAS) / Evaluasi Proyek</td>
+                                    <td class="border border-slate-300 p-2 text-center">15%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+
+                document.getElementById('rpsOutputBox').innerHTML = rpsHtml;
+                document.getElementById('rpsActionBtns').classList.remove('hidden');
+
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles"></i> <span>Generate RPS Lengkap</span>`;
+
+                // Save to Vault
+                const newDoc = { id: 'rps_' + Date.now(), type: 'RPS', title: `RPS ${matkul}`, date: new Date().toISOString().split('T')[0], content: rpsHtml };
+                documentVault.unshift(newDoc);
+                renderVaultTable(documentVault);
+                updateStats();
+                showToast('Matriks RPS berhasil dibuat!', 'success');
+            }, 1200);
+        }
+
+        function handleGenerateModul(e) {
+            e.preventDefault();
+            const topik = document.getElementById('modulTopik').value;
+            const pertemuan = document.getElementById('modulPertemuan').value;
+            const format = document.getElementById('modulFormat').value;
+
+            const btn = document.getElementById('btnGenModul');
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Menyusun Bahan Ajar...`;
+
+            setTimeout(() => {
+                const modulHtml = `
+                    <div class="space-y-4 bg-white p-6 rounded-xl border border-slate-200">
+                        <div class="border-b pb-3">
+                            <span class="text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded">${format}</span>
+                            <h2 class="text-xl font-bold text-slate-800 mt-2">${topik}</h2>
+                            <p class="text-xs text-slate-500">Target Pembelajaran: ${pertemuan}</p>
+                        </div>
+
+                        <div class="space-y-3 text-xs leading-relaxed text-slate-700">
+                            <h4 class="font-bold text-sm text-slate-800">1. Pendahuluan & Tujuan Instruksional</h4>
+                            <p>Pada modul ini, mahasiswa dipandu untuk memahami fondasi konseptual ${topik} serta relevansinya dalam penyelesaian masalah nyata di industri modern.</p>
+
+                            <h4 class="font-bold text-sm text-slate-800">2. Pembahasan Uraian Materi</h4>
+                            <p>Pengembangan konsep ${topik} mencakup 3 aspek mendasar:</p>
+                            <ul class="list-disc list-inside pl-2 space-y-1">
+                                <li><strong>Prinsip Utama:</strong> Mengidentifikasi variabel kunci dan pola data.</li>
+                                <li><strong>Kerangka Kerja:</strong> Langkah-langkah penyusunan alur algoritma terstruktur.</li>
+                                <li><strong>Optimasi:</strong> Teknik evaluasi efisiensi dan penyempurnaan akurasi hasil.</li>
+                            </ul>
+
+                            <h4 class="font-bold text-sm text-slate-800">3. Studi Kasus & Aplikasi</h4>
+                            <div class="p-3 bg-slate-50 rounded-lg border border-slate-200 italic">
+                                "Skenario Aplikasi: Implementasi algoritma pada analisis dataset dinamis untuk prediksi pola efisiensi secara real-time."
+                            </div>
+
+                            <h4 class="font-bold text-sm text-slate-800">4. Latihan Soal Mandiri</h4>
+                            <ol class="list-decimal list-inside pl-2 space-y-1">
+                                <li>Uraikan keunggulan utama dari pendekatan ${topik} dibanding metode konvensional!</li>
+                                <li>Buatlah rancangan alur kerja sederhana untuk mengatasi kendala noise data!</li>
+                            </ol>
+                        </div>
+                    </div>
+                `;
+
+                document.getElementById('modulOutputBox').innerHTML = modulHtml;
+                document.getElementById('modulActionBtns').classList.remove('hidden');
+
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles"></i> <span>Generate Bahan Ajar</span>`;
+
+                const newDoc = { id: 'mod_' + Date.now(), type: 'BAHAN_AJAR', title: `Modul: ${topik}`, date: new Date().toISOString().split('T')[0], content: modulHtml };
+                documentVault.unshift(newDoc);
+                renderVaultTable(documentVault);
+                updateStats();
+                showToast('Modul Bahan Ajar berhasil disiap!', 'success');
+            }, 1200);
+        }
+
+        function handleGenerateSoal(e) {
+            e.preventDefault();
+            const topik = document.getElementById('soalTopik').value;
+            const tipe = document.getElementById('soalTipe').value;
+            const jumlah = document.getElementById('soalJumlah').value;
+            const bloom = document.getElementById('soalBloom').value;
+
+            const btn = document.getElementById('btnGenSoal');
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Menyusun Soal...`;
+
+            setTimeout(() => {
+                let soalItems = '';
+                for (let i = 1; i <= jumlah; i++) {
+                    soalItems += `
+                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-2">
+                            <div class="flex justify-between items-center font-bold text-slate-700">
+                                <span>Soal Nomor ${i}</span>
+                                <span class="text-[10px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded">${bloom}</span>
+                            </div>
+                            <p class="text-slate-800 font-medium">Analisislah skenario berikut terkait materi ${topik} untuk menentukan strategi optimasi terbaik...</p>
+                            ${tipe.includes('Pilihan Ganda') ? `
+                                <div class="grid grid-cols-2 gap-2 pl-2 text-slate-600">
+                                    <div>A. Pendekatan Komputasi Paralel</div>
+                                    <div>B. Reduksi Dimensi Variabel</div>
+                                    <div>C. Normalisasi Distribusi Data</div>
+                                    <div>D. Penggunaan Filtering Heuristik</div>
+                                </div>
+                                <p class="text-[11px] text-emerald-700 font-bold pt-1">Kunci Jawaban: B (Reduksi Dimensi Variabel)</p>
+                            ` : `
+                                <div class="p-2.5 bg-white rounded border border-slate-200 text-[11px] text-slate-600">
+                                    <strong>Rubrik Jawaban:</strong> Bobot maksimal diberikan jika mahasiswa menjelaskan latar belakang, argumen matematis, dan contoh penerapannya secara rinci.
+                                </div>
+                            `}
+                        </div>
+                    `;
+                }
+
+                const soalHtml = `
+                    <div class="space-y-4 print-container bg-white p-6 rounded-xl text-slate-800">
+                        <div class="text-center border-b pb-3">
+                            <h2 class="text-base font-bold uppercase">Lembar Evaluasi & Bank Soal</h2>
+                            <h3 class="text-sm font-semibold text-amber-700">${topik}</h3>
+                            <p class="text-xs text-slate-500">Tipe: ${tipe} | Jumlah: ${jumlah} Soal</p>
+                        </div>
+                        <div class="space-y-3">
+                            ${soalItems}
+                        </div>
+                    </div>
+                `;
+
+                document.getElementById('soalOutputBox').innerHTML = soalHtml;
+                document.getElementById('soalActionBtns').classList.remove('hidden');
+
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles"></i> <span>Generate Set Soal</span>`;
+
+                const newDoc = { id: 'soal_' + Date.now(), type: 'SOAL', title: `Soal: ${topik}`, date: new Date().toISOString().split('T')[0], content: soalHtml };
+                documentVault.unshift(newDoc);
+                renderVaultTable(documentVault);
+                updateStats();
+                showToast('Set Soal & Evaluasi berhasil dibuat!', 'success');
+            }, 1200);
+        }
+
+        function renderVaultTable(docs) {
+            const tbody = document.getElementById('tblVaultBody');
+            if (!docs || docs.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="py-8 text-center text-slate-400 text-xs">Tidak ada dokumen ditemukan.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = docs.map(doc => {
+                let badgeClass = 'bg-indigo-100 text-indigo-700';
+                if (doc.type === 'BAHAN_AJAR') badgeClass = 'bg-emerald-100 text-emerald-700';
+                if (doc.type === 'SOAL') badgeClass = 'bg-amber-100 text-amber-700';
+
+                return `
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="py-3 px-4">
+                            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold ${badgeClass}">${doc.type}</span>
+                        </td>
+                        <td class="py-3 px-4 font-semibold text-slate-700">${doc.title}</td>
+                        <td class="py-3 px-4 text-xs text-slate-500">${doc.date}</td>
+                        <td class="py-3 px-4 text-center">
+                            <button onclick="previewDoc('${doc.id}')" class="px-2.5 py-1 bg-brand-50 hover:bg-brand-100 text-brand-700 rounded-lg text-xs font-semibold transition-all">
+                                <i class="fa-solid fa-eye mr-1"></i> Lihat
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function filterVaultDocs() {
+            const search = document.getElementById('txtSearchVault').value.toLowerCase();
+            const filterType = document.getElementById('selFilterType').value;
+
+            const filtered = documentVault.filter(d => {
+                const matchSearch = d.title.toLowerCase().includes(search);
+                const matchType = filterType === 'ALL' || d.type === filterType;
+                return matchSearch && matchType;
+            });
+
+            renderVaultTable(filtered);
+        }
+
+        function previewDoc(id) {
+            const doc = documentVault.find(d => d.id === id);
+            if (doc) {
+                document.getElementById('modalDocTitle').innerText = doc.title;
+                document.getElementById('modalDocBody').innerHTML = doc.content;
+                document.getElementById('modalPreviewDoc').classList.remove('hidden');
+            }
+        }
+
+        function closeModalDoc() {
+            document.getElementById('modalPreviewDoc').classList.add('hidden');
+        }
+
+        function printRPSResult() {
+            window.print();
+        }
+
+        function printSoalResult() {
+            window.print();
+        }
+
+        function copyModulText() {
+            const text = document.getElementById('modulOutputBox').innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('Teks modul berhasil disalin ke clipboard!', 'success');
+            });
+        }
+
+        function handleSaveApiKey(e) {
+            e.preventDefault();
+            activeApiKey = document.getElementById('txtApiKey').value;
+            showToast('Kunci Gemini API berhasil diperbarui!', 'success');
+        }
+
+        function handleAddUser(e) {
+            e.preventDefault();
+            showToast('Akun Dosen baru berhasil didaftarkan!', 'success');
+            document.getElementById('frmAddUser').reset();
+        }
+
+        function showToast(msg, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            
+            let bg = 'bg-slate-800 text-white';
+            if (type === 'success') bg = 'bg-emerald-600 text-white';
+            if (type === 'error') bg = 'bg-rose-600 text-white';
+
+            toast.className = `${bg} pointer-events-auto px-4 py-2.5 rounded-xl shadow-xl text-xs font-semibold flex items-center gap-2 transition-all duration-300 transform translate-y-2 opacity-0`;
+            toast.innerHTML = `<span>${msg}</span>`;
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            }, 10);
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
