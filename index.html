@@ -236,8 +236,13 @@
                     </button>
 
                     <button data-target="secSoal" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 text-sm font-medium rounded-xl text-slate-600 hover:bg-slate-100 transition-all">
-                        <i class="fa-solid fa-[#f59e0b] fa-list-check w-5 text-center text-amber-500"></i>
+                        <i class="fa-solid fa-list-check w-5 text-center text-amber-500"></i>
                         <span>AI Soal & Evaluasi</span>
+                    </button>
+
+                    <button data-target="secArtikel" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 text-sm font-medium rounded-xl text-slate-600 hover:bg-slate-100 transition-all">
+                        <i class="fa-solid fa-newspaper w-5 text-center text-rose-500"></i>
+                        <span>AI Artikel Ilmiah</span>
                     </button>
 
                     <button data-target="secVault" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 text-sm font-medium rounded-xl text-slate-600 hover:bg-slate-100 transition-all">
@@ -329,7 +334,7 @@
                     </div>
 
                     <!-- Statistics Cards -->
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         <div class="p-5 bg-white rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
                             <div>
                                 <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total RPS Dibuat</p>
@@ -359,11 +364,21 @@
                                 <i class="fa-solid fa-list-check"></i>
                             </div>
                         </div>
+
+                        <div class="p-5 bg-white rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+                            <div>
+                                <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Artikel Tergenerate</p>
+                                <h3 id="statTotalArtikel" class="text-2xl font-black text-slate-800 mt-1">0</h3>
+                            </div>
+                            <div class="w-12 h-12 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center text-xl">
+                                <i class="fa-solid fa-newspaper"></i>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Quick Action Cards -->
                     <h3 class="text-base font-bold text-slate-800 pt-2">Akses Cepat Generator AI</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
                         <div onclick="switchSection('secRPS')" class="p-6 bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-brand-300 transition-all cursor-pointer group">
                             <div class="w-12 h-12 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition-transform">
                                 <i class="fa-solid fa-layer-group"></i>
@@ -382,10 +397,18 @@
 
                         <div onclick="switchSection('secSoal')" class="p-6 bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-brand-300 transition-all cursor-pointer group">
                             <div class="w-12 h-12 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition-transform">
-                                <i class="fa-solid fa-[#f59e0b] fa-file-circle-question"></i>
+                                <i class="fa-solid fa-file-circle-question"></i>
                             </div>
                             <h4 class="font-bold text-slate-800 text-base mb-1">AI Soal & Evaluasi</h4>
                             <p class="text-xs text-slate-500 leading-relaxed">Generasi paket bank soal Taksonomi Bloom (C1-C6) dilengkapi kunci dan rubrik jawaban.</p>
+                        </div>
+
+                        <div onclick="switchSection('secArtikel')" class="p-6 bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-brand-300 transition-all cursor-pointer group">
+                            <div class="w-12 h-12 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center text-xl mb-4 group-hover:scale-110 transition-transform">
+                                <i class="fa-solid fa-newspaper"></i>
+                            </div>
+                            <h4 class="font-bold text-slate-800 text-base mb-1">AI Artikel Ilmiah</h4>
+                            <p class="text-xs text-slate-500 leading-relaxed">Susun draf artikel jurnal atau tulisan populer lengkap dengan abstrak hingga kesimpulan.</p>
                         </div>
                     </div>
                 </section>
@@ -587,6 +610,73 @@
                     </div>
                 </section>
 
+                <section id="secArtikel" class="content-section hidden space-y-6">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-800">AI Artikel Ilmiah</h2>
+                        <p class="text-xs text-slate-500">Susun Draf Artikel Jurnal, Tulisan Populer, atau Blog Ilmiah Secara Terstruktur</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                        <div class="lg:col-span-5 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                            <h3 class="font-bold text-sm text-slate-700 border-b pb-2"><i class="fa-solid fa-sliders text-rose-600 mr-2"></i> Konfigurasi Artikel</h3>
+                            
+                            <form id="frmGenerateArtikel" onsubmit="handleGenerateArtikel(event)" class="space-y-3.5">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-600 mb-1">Judul / Tema Artikel</label>
+                                    <input type="text" id="artikelJudul" required class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-rose-500 outline-none" placeholder="Contoh: Penerapan AI dalam Pendidikan Tinggi">
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-xs font-semibold text-slate-600 mb-1">Jenis Artikel</label>
+                                        <select id="artikelJenis" class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-rose-500 outline-none bg-white">
+                                            <option value="Artikel Ilmiah (Jurnal)">Artikel Ilmiah (Jurnal)</option>
+                                            <option value="Artikel Populer">Artikel Populer / Media Massa</option>
+                                            <option value="Artikel Blog">Artikel Blog / Opini</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-semibold text-slate-600 mb-1">Target Jumlah Kata</label>
+                                        <select id="artikelPanjang" class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-rose-500 outline-none bg-white">
+                                            <option value="500 kata">± 500 Kata</option>
+                                            <option value="1.000 kata">± 1.000 Kata</option>
+                                            <option value="2.000 kata">± 2.000 Kata</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-600 mb-1">Kata Kunci (Opsional)</label>
+                                    <input type="text" id="artikelKeyword" class="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-300 focus:ring-2 focus:ring-rose-500 outline-none" placeholder="machine learning, pembelajaran adaptif">
+                                </div>
+
+                                <button type="submit" id="btnGenArtikel" class="w-full py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold text-sm rounded-xl shadow-md transition-all flex items-center justify-center gap-2">
+                                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                                    <span>Generate Artikel</span>
+                                </button>
+                            </form>
+                        </div>
+
+                        <div class="lg:col-span-7 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col">
+                            <div class="flex items-center justify-between border-b pb-3 mb-3">
+                                <h3 class="font-bold text-sm text-slate-700"><i class="fa-solid fa-newspaper text-rose-600 mr-2"></i> Draf Artikel</h3>
+                                <div id="artikelActionBtns" class="hidden items-center gap-2">
+                                    <button onclick="copyArtikelText()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-lg transition-all flex items-center gap-1.5">
+                                        <i class="fa-solid fa-copy"></i> Salin Teks
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div id="artikelOutputBox" class="flex-1 overflow-y-auto max-h-[550px] custom-scrollbar rounded-xl bg-slate-50 p-5 border border-slate-200 text-sm leading-relaxed">
+                                <div class="text-center py-16 text-slate-400">
+                                    <i class="fa-solid fa-file-pen text-4xl mb-2 text-slate-300"></i>
+                                    <p class="text-sm">Konfigurasi tema artikel dan tekan "Generate Artikel"</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
                 <section id="secVault" class="content-section hidden space-y-6">
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div>
@@ -601,6 +691,7 @@
                                 <option value="RPS">RPS</option>
                                 <option value="BAHAN_AJAR">Bahan Ajar</option>
                                 <option value="SOAL">Soal Evaluasi</option>
+                                <option value="ARTIKEL">Artikel</option>
                             </select>
                         </div>
                     </div>
@@ -891,10 +982,12 @@
             const totalRPS = documentVault.filter(d => d.type === 'RPS').length;
             const totalModul = documentVault.filter(d => d.type === 'BAHAN_AJAR').length;
             const totalSoal = documentVault.filter(d => d.type === 'SOAL').length;
+            const totalArtikel = documentVault.filter(d => d.type === 'ARTIKEL').length;
 
             document.getElementById('statTotalRPS').innerText = totalRPS;
             document.getElementById('statTotalBahanAjar').innerText = totalModul;
             document.getElementById('statTotalSoal').innerText = totalSoal;
+            document.getElementById('statTotalArtikel').innerText = totalArtikel;
         }
 
         function handleGenerateRPS(e) {
@@ -1109,6 +1202,66 @@
             }, 1200);
         }
 
+        function handleGenerateArtikel(e) {
+            e.preventDefault();
+            const judul = document.getElementById('artikelJudul').value;
+            const jenis = document.getElementById('artikelJenis').value;
+            const panjang = document.getElementById('artikelPanjang').value;
+            const keyword = document.getElementById('artikelKeyword').value;
+
+            const btn = document.getElementById('btnGenArtikel');
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Menyusun Artikel...`;
+
+            setTimeout(() => {
+                const artikelHtml = `
+                    <div class="space-y-4 bg-white p-6 rounded-xl border border-slate-200">
+                        <div class="border-b pb-3">
+                            <span class="text-[10px] font-bold uppercase tracking-wider bg-rose-100 text-rose-800 px-2 py-0.5 rounded">${jenis}</span>
+                            <h2 class="text-xl font-bold text-slate-800 mt-2">${judul}</h2>
+                            <p class="text-xs text-slate-500">Target: ${panjang}${keyword ? ' | Kata Kunci: ' + keyword : ''}</p>
+                        </div>
+
+                        <div class="space-y-3 text-xs leading-relaxed text-slate-700">
+                            <h4 class="font-bold text-sm text-slate-800">Abstrak</h4>
+                            <p class="italic">Artikel ini mengkaji secara komprehensif penerapan ${judul} melalui pendekatan analitis-deskriptif untuk mengungkap pola, tantangan, serta peluang pengembangannya pada konteks kekinian.${keyword ? ' Kajian difokuskan pada aspek ' + keyword + '.' : ''}</p>
+
+                            <h4 class="font-bold text-sm text-slate-800">1. Pendahuluan</h4>
+                            <p>Perkembangan zaman menjadikan ${judul} sebagai topik yang strategis untuk dikaji. Bagian ini menguraikan latar belakang persoalan, urgensi kajian, dan kontribusi yang diharapkan dari artikel ini.</p>
+
+                            <h4 class="font-bold text-sm text-slate-800">2. Metode Kajian</h4>
+                            <p>Kajian dilakukan melalui telaah pustaka sistematis terhadap sumber primer yang relevan, disertai analisis konten untuk menarik simpulan yang sahih dan dapat dipertanggungjawabkan.</p>
+
+                            <h4 class="font-bold text-sm text-slate-800">3. Hasil dan Pembahasan</h4>
+                            <p>Temuan menunjukkan bahwa implementasi ${judul} memberikan dampak signifikan, dengan catatan adanya tantangan berupa kesiapan sumber daya serta kebutuhan kerangka kebijakan yang mendukung.</p>
+
+                            <h4 class="font-bold text-sm text-slate-800">4. Kesimpulan</h4>
+                            <p>${judul} berpotensi besar untuk dikembangkan lebih lanjut. Penelitian lanjutan disarankan memperluas cakupan data serta memperdalam analisis komparatif.</p>
+                        </div>
+                    </div>
+                `;
+
+                document.getElementById('artikelOutputBox').innerHTML = artikelHtml;
+                document.getElementById('artikelActionBtns').classList.remove('hidden');
+
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles"></i> <span>Generate Artikel</span>`;
+
+                const newDoc = { id: 'art_' + Date.now(), type: 'ARTIKEL', title: `Artikel: ${judul}`, date: new Date().toISOString().split('T')[0], content: artikelHtml };
+                documentVault.unshift(newDoc);
+                renderVaultTable(documentVault);
+                updateStats();
+                showToast('Draf artikel berhasil dibuat!', 'success');
+            }, 1200);
+        }
+
+        function copyArtikelText() {
+            const text = document.getElementById('artikelOutputBox').innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('Teks artikel berhasil disalin ke clipboard!', 'success');
+            });
+        }
+
         function renderVaultTable(docs) {
             const tbody = document.getElementById('tblVaultBody');
             if (!docs || docs.length === 0) {
@@ -1120,6 +1273,7 @@
                 let badgeClass = 'bg-indigo-100 text-indigo-700';
                 if (doc.type === 'BAHAN_AJAR') badgeClass = 'bg-emerald-100 text-emerald-700';
                 if (doc.type === 'SOAL') badgeClass = 'bg-amber-100 text-amber-700';
+                if (doc.type === 'ARTIKEL') badgeClass = 'bg-rose-100 text-rose-700';
 
                 return `
                     <tr class="hover:bg-slate-50 transition-colors">
